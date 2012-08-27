@@ -314,6 +314,20 @@ void *Loader::load_driver(const char* kind,
                 return true;
             }
 
+            char property[PROPERTY_VALUE_MAX];
+            /* Support SW composition in Surfaceflinger as a debug option */
+            if (property_get("debug.sf.hw", property, NULL) > 0) {
+                if (atoi(property) == 0) {
+                    const char *cmdline = getProcessCmdline();
+                    if (strstr(cmdline, "surfaceflinger")) {
+                        ALOGD("SW composition in Surfaceflinger requested. "
+                              "Loading the software renderer.");
+                        result.setTo("/system/lib/egl/libGLES_android.so");
+                        return true;
+                    }
+                }
+            }
+
             if (exact) {
                 String8 absolutePath;
                 absolutePath.appendFormat("%s/%s.so", search, pattern.string());
