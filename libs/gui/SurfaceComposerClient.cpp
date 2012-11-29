@@ -438,6 +438,17 @@ void Composer::setDisplaySize(const sp<IBinder>& token, uint32_t width, uint32_t
     s.what |= DisplayState::eDisplaySizeChanged;
 }
 
+#if defined(MR0_CAMERA_BLOB)
+status_t Composer::setOrientation(int orientation) {
+    sp<ISurfaceComposer> sm(ComposerService::getComposerService());
+    sp<IBinder> token(sm->getBuiltInDisplay(ISurfaceComposer::eDisplayIdMain));
+    DisplayState& s(getDisplayStateLocked(token));
+    s.orientation = orientation;
+    mForceSynchronous = true; // TODO: do we actually still need this?
+    return NO_ERROR;
+}
+#endif
+
 // ---------------------------------------------------------------------------
 
 SurfaceComposerClient::SurfaceComposerClient()
@@ -638,6 +649,13 @@ status_t SurfaceComposerClient::setMatrix(const sp<IBinder>& id, float dsdx, flo
         float dsdy, float dtdy) {
     return getComposer().setMatrix(this, id, dsdx, dtdx, dsdy, dtdy);
 }
+
+#if defined(MR0_CAMERA_BLOB)
+status_t SurfaceComposerClient::setOrientation(int32_t dpy, int orientation, uint32_t flags)
+{
+    return Composer::getInstance().setOrientation(orientation);
+}
+#endif
 
 // ----------------------------------------------------------------------------
 
