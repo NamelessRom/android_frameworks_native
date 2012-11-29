@@ -123,6 +123,10 @@ public:
     //! Close a composer transaction on all active SurfaceComposerClients.
     static void closeGlobalTransaction(bool synchronous = false);
 
+#if defined(MR0_CAMERA_BLOB)
+    static int setOrientation(int32_t dpy, int orientation, uint32_t flags);
+#endif
+
     //! Flag the currently open transaction as an animation transaction.
     static void setAnimationTransaction();
 
