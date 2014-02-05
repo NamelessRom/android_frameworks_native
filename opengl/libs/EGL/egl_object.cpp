@@ -93,6 +93,9 @@ egl_context_t::egl_context_t(EGLDisplay dpy, EGLContext context, EGLConfig confi
 void egl_context_t::onLooseCurrent() {
     read = NULL;
     draw = NULL;
+    if (!gl_extensions.isEmpty()) {
+        gl_extensions.setTo("");
+    }
 }
 
 void egl_context_t::onMakeCurrent(EGLSurface draw, EGLSurface read) {
