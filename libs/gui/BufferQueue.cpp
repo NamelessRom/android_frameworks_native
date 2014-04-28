@@ -469,7 +469,6 @@ status_t BufferQueue::dequeueBuffer(int *outBuf, sp<Fence>* outFence, bool async
 
     if (returnFlags & IGraphicBufferProducer::BUFFER_NEEDS_REALLOCATION) {
         status_t error;
-        mGraphicBufferAlloc->acquireBufferReferenceSlot(*outBuf);
         sp<GraphicBuffer> graphicBuffer(
                 mGraphicBufferAlloc->createGraphicBuffer(w, h, format, usage, &error));
         if (graphicBuffer == 0) {
@@ -882,7 +881,6 @@ void BufferQueue::dump(String8& result, const char* prefix) const {
 void BufferQueue::freeBufferLocked(int slot) {
     ST_LOGV("freeBufferLocked: slot=%d", slot);
     mSlots[slot].mGraphicBuffer = 0;
-    mGraphicBufferAlloc->releaseBufferReferenceSlot(slot);
     if (mSlots[slot].mBufferState == BufferSlot::ACQUIRED) {
         mSlots[slot].mNeedsCleanupOnRelease = true;
     }
