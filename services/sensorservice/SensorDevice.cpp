@@ -157,6 +157,8 @@ void SensorDevice::autoDisable(void *ident, int handle) {
     info.removeBatchParamsForIdent(ident);
 }
 
+#define ARRAY_SIZE(x) (sizeof(x) / sizeof(*x))
+
 status_t SensorDevice::activate(void* ident, int handle, int enabled)
 {
     if (!mSensorDevice) return NO_INIT;
@@ -164,17 +166,23 @@ status_t SensorDevice::activate(void* ident, int handle, int enabled)
     bool actuateHardware = false;
 #ifdef SYSFS_LIGHT_SENSOR
     if (handle == DUMMY_ALS_HANDLE) {
-        int nwr, ret, fd;
-        char value[2];
+        const char *filenames[] = {SYSFS_LIGHT_SENSOR};
+        bool found = false;
 
-        fd = open(SYSFS_LIGHT_SENSOR, O_RDWR);
-        if(fd < 0)
-            return -ENODEV;
+        for (size_t i = 0; i < ARRAY_SIZE(filenames); ++i) {
+            int fd = open(filenames[i], O_RDWR);
 
-        nwr = snprintf(value, 2, "%d\n", enabled ? 1 : 0);
-        write(fd, value, nwr);
-        close(fd);
-        return 0;
+            if (fd < 0)
+                continue;
+
+            found = true;
+            char value[2];
+            int nwr = snprintf(value, 2, "%d\n", enabled ? 1 : 0);
+            write(fd, value, nwr);
+            close(fd);
+        }
+
+        return found ? 0 : -ENODEV;
     }
 #endif
 
