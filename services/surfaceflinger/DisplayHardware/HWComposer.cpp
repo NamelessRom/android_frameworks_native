@@ -43,11 +43,6 @@
 
 #include "HWComposer.h"
 
-#if defined(TARGET_EXYNOS4_MALI_NO_FENCE)
-unsigned int flag_fbPost_called = 0;
-unsigned int flag_commit_called = 0;
-#endif
-
 #include "../Layer.h"           // needed only for debugging
 #include "../SurfaceFlinger.h"
 
@@ -864,10 +859,6 @@ status_t HWComposer::prepare() {
             }
         }
     }
-#if defined(TARGET_EXYNOS4_MALI_NO_FENCE)
-    flag_fbPost_called = 0;
-    flag_commit_called = 0;
-#endif
     return (status_t)err;
 }
 
@@ -925,19 +916,7 @@ status_t HWComposer::commit() {
                         disp.outbufAcquireFence->dup();
                 }
             }
-#if defined(TARGET_EXYNOS4_MALI_NO_FENCE)
-            int retrycount = 17;
-            while ((hasGlesComposition(DisplayDevice::DISPLAY_PRIMARY)) &&
-                   (flag_fbPost_called == flag_commit_called) && (--retrycount >= 0)) {
-                usleep(1000);
-                ALOGV("commit() waits fbPost() retrycount = %d", retrycount);
-            }
-#endif
             err = mHwc->set(mHwc, mNumDisplays, mLists);
-#if defined(TARGET_EXYNOS4_MALI_NO_FENCE)
-            if (hasGlesComposition(DisplayDevice::DISPLAY_PRIMARY))
-                flag_commit_called++;
-#endif
         } else {
             err = hwcSet(mHwc, eglGetCurrentDisplay(), eglGetCurrentSurface(EGL_DRAW), mNumDisplays,
                     const_cast<hwc_display_contents_1_t**>(mLists));
@@ -1012,14 +991,7 @@ bool HWComposer::supportsFramebufferTarget() const {
 int HWComposer::fbPost(int32_t id,
         const sp<Fence>& acquireFence, const sp<GraphicBuffer>& buffer) {
     if (mHwc && hwcHasApiVersion(mHwc, HWC_DEVICE_API_VERSION_1_1)) {
-#if defined(TARGET_EXYNOS4_MALI_NO_FENCE)
-        int ret = setFramebufferTarget(id, acquireFence, buffer);
-        if (hasGlesComposition(DisplayDevice::DISPLAY_PRIMARY))
-            flag_fbPost_called++;
-        return ret;
-#else
         return setFramebufferTarget(id, acquireFence, buffer);
-#endif
     } else {
         acquireFence->waitForever("HWComposer::fbPost");
         return mFbDev->post(mFbDev, buffer->handle);
