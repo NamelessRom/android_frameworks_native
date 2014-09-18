@@ -671,6 +671,12 @@ int dexopt(const char *apk_path, uid_t uid, int is_public)
     /* The command to run depend ones the value of persist.sys.dalvik.vm.lib */
     property_get("persist.sys.dalvik.vm.lib", persist_sys_dalvik_vm_lib, "libdvm.so");
 
+    /* Check if libart exists, else we can cause bootloops on systems without ART */
+    if ((strncmp(persist_sys_dalvik_vm_lib, "libart", 6) == 0)
+                && (access(strcat("/system/lib/libart.so"), F_OK) == -1)) {
+        sprintf(persist_sys_dalvik_vm_lib, "libdvm.so");
+    }
+
     /* Before anything else: is there a .odex file?  If so, we have
      * precompiled the apk and there is nothing to do here.
      */
