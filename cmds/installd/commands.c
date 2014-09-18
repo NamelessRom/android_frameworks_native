@@ -671,6 +671,14 @@ int dexopt(const char *apk_path, uid_t uid, int is_public)
     /* The command to run depend ones the value of persist.sys.dalvik.vm.lib */
     property_get("persist.sys.dalvik.vm.lib", persist_sys_dalvik_vm_lib, "libdvm.so");
 
+    /* Check if the custom runtime lib exists, else we can cause bootloops */
+    if ((!strncmp(persist_sys_dalvik_vm_lib, "libdvm", 6) == 0) &&
+            (access(strcat("/system/lib/", persist_sys_dalvik_vm_lib), F_OK) == -1)) {
+        ALOGV("%s not found! falling back to libdvm.so\n", persist_sys_dalvik_vm_lib);
+        sprintf(persist_sys_dalvik_vm_lib, "libdvm.so");
+        property_set("persist.sys.dalvik.vm.lib", persist_sys_dalvik_vm_lib);
+    }
+
     /* Before anything else: is there a .odex file?  If so, we have
      * precompiled the apk and there is nothing to do here.
      */
