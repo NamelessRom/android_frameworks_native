@@ -724,6 +724,8 @@ status_t SurfaceFlinger::getDisplayInfo(const sp<IBinder>& display, DisplayInfo*
             return density;
         }
     public:
+        static int getGodDensity() {
+            return getDensityFromProperty("persist.sf.lcd_density"); }
         static int getEmuDensity() {
             return getDensityFromProperty("qemu.sf.lcd_density"); }
         static int getBuildDensity()  {
@@ -739,8 +741,12 @@ status_t SurfaceFlinger::getDisplayInfo(const sp<IBinder>& display, DisplayInfo*
             ALOGE("ro.sf.lcd_density must be defined as a build property");
             density = xdpi / 160.0f;
         }
-        if (Density::getEmuDensity()) {
-            // if "qemu.sf.lcd_density" is specified, it overrides everything
+        if (Density::getGodDensity() && Density::getGodDensity() != 0) {
+            // if "persist.sf.lcd_density" is specified, it overrides everything
+            xdpi = ydpi = density = Density::getGodDensity();
+            density /= 160.0f;
+        } else if (Density::getEmuDensity()) {
+            // if "qemu.sf.lcd_density" is specified, it overrides everything except god
             xdpi = ydpi = density = Density::getEmuDensity();
             density /= 160.0f;
         }
