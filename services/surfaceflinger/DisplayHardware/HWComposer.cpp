@@ -207,6 +207,9 @@ HWComposer::HWComposer(
     mDebugForceFakeVSync = atoi(value);
 
     bool needVSyncThread = true;
+#ifdef MRVL_HARDWARE
+    int mHw_vsync = 0;
+#endif
 
     // Note: some devices may insist that the FB HAL be opened before HWC.
     int fberr = loadFbHalModule();
@@ -261,7 +264,17 @@ HWComposer::HWComposer(
         }
 
         // don't need a vsync thread if we have a hardware composer
+#ifdef MRVL_HARDWARE
+        property_get("ro.config.used_hw_vsync", value, "0");
+        mHw_vsync = atoi(value);
+        if (mHw_vsync) {
+            needVSyncThread = false;
+        } else {
+            needVSyncThread = true;
+        }
+#else
         needVSyncThread = false;
+#endif
         // always turn vsync off when we start
         if (hwcHasVsyncEvent(mHwc)) {
             eventControl(HWC_DISPLAY_PRIMARY, HWC_EVENT_VSYNC, 0);
@@ -1150,6 +1163,11 @@ public:
     virtual void setBlending(uint32_t blending) {
         getLayer()->blending = blending;
     }
+#ifdef MRVL_HARDWARE
+    virtual void setAlpha(uint32_t alpha) {
+        getLayer()->alpha = alpha;
+    }
+#endif
     virtual void setTransform(uint32_t transform) {
         getLayer()->transform = transform;
     }
@@ -1273,6 +1291,11 @@ public:
     virtual void setBlending(uint32_t blending) {
         getLayer()->blending = blending;
     }
+#ifdef MRVL_HARDWARE
+    virtual void setAlpha(uint32_t alpha) {
+        getLayer()->alpha = alpha;
+    }
+#endif
     virtual void setTransform(uint32_t transform) {
         getLayer()->transform = transform;
     }

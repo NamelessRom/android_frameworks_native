@@ -435,6 +435,9 @@ void Layer::setGeometry(
 #endif
     layer.setCrop(computeCrop(hw));
     layer.setPlaneAlpha(s.alpha);
+#ifdef MRVL_HARDWARE
+    layer.setAlpha(s.alpha);
+#endif
 
     Transform transform = computeBufferTransform(hw);
 

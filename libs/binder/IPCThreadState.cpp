@@ -366,6 +366,12 @@ extern "C" int _ZN7android14IPCThreadState13getCallingPidEv(IPCThreadState *stat
     return state->getCallingPid();
 }
 
+#ifdef MRVL_HARDWARE
+extern "C" int _ZN7android14IPCThreadState13getCallingUidEv(IPCThreadState *state) {
+ return state->getCallingUid();
+}
+#endif
+
 int IPCThreadState::getCallingPid() const
 {
     return mCallingPid;

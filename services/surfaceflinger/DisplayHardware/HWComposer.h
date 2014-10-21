@@ -174,6 +174,9 @@ public:
         virtual void setSkip(bool skip) = 0;
         virtual void setAnimating(bool animating) = 0;
         virtual void setBlending(uint32_t blending) = 0;
+#ifdef MRVL_HARDWARE
+        virtual void setAlpha(uint32_t alpha) = 0;
+#endif
         virtual void setTransform(uint32_t transform) = 0;
         virtual void setFrame(const Rect& frame) = 0;
         virtual void setCrop(const FloatRect& crop) = 0;
