@@ -108,6 +108,7 @@ static void dumpstate() {
     printf("\n");
 
     run_command("UPTIME", 10, "uptime", NULL);
+    dump_file("MMC PERF", "/sys/block/mmcblk0/stat");
     dump_file("MEMORY INFO", "/proc/meminfo");
     run_command("CPU INFO", 10, "top", "-n", "1", "-d", "1", "-m", "30", "-t", NULL);
     run_command("PROCRANK", 20, "procrank", NULL);
