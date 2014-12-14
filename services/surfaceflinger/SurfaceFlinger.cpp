@@ -2117,6 +2117,37 @@ void SurfaceFlinger::doDisplayComposition(const sp<const DisplayDevice>& hw,
     hw->swapRegion.orSelf(dirtyRegion);
 
     // swap buffers (presentation)
+#ifdef SWAP_BUFFERS_WORKAROUND
+    /* SwapBuffers on Exynos4 might block if called without
+     * any visible regions. This maybe a driver bug which
+     * needs to be investigated. As a workaround, check if
+     * atleast one layer has a visible region before attempting
+     * to call swapBuffers
+     */
+    HWComposer& hwc(getHwComposer());
+    int visibleRegions = 0;
+    for (size_t dpy=0 ; dpy<mDisplays.size() ; dpy++) {
+        sp<const DisplayDevice> hw(mDisplays[dpy]);
+        const int32_t id = hw->getHwcDisplayId();
+            if (id >= 0) {
+                const Vector< sp<Layer> >& currentLayers(
+                    hw->getVisibleLayersSortedByZ());
+                const size_t count = currentLayers.size();
+                HWComposer::LayerListIterator cur = hwc.begin(id);
+                const HWComposer::LayerListIterator end = hwc.end(id);
+                for (size_t i=0 ; cur!=end && i<count ; ++i, ++cur) {
+                    const sp<Layer>& layer(currentLayers[i]);
+                    const Layer::State& s(layer->getDrawingState());
+                    Rect bounds(s.transform.transform(layer->computeBounds()));
+                    Region visibleRegion;
+                    visibleRegion.set(bounds);
+                    if (!visibleRegion.isEmpty())
+                        visibleRegions++;
+                }
+            }
+    }
+    if (visibleRegions)
+#endif
     hw->swapBuffers(getHwComposer());
 }
 
