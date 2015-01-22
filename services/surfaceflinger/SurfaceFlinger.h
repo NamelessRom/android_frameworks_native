@@ -516,8 +516,6 @@ private:
     bool mGpuTileRenderEnable;
     bool mCanUseGpuTileRender;
     Rect mUnionDirtyRect;
-    Rect mUnionDirtyRectPrev;
-    int mDRCount;
 
 #ifdef QCOM_BSP
     // Set up the DirtyRect/flags for GPU Comp optimization if required.
