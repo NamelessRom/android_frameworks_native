@@ -99,7 +99,7 @@
 #define DISPLAY_COUNT       1
 #define MIN_DIRTYRECT_COUNT 5
 
-#define DEBUG_FPS           true
+#define DEBUG_FPS           false
 
 /*
  * DEBUG_SCREENSHOTS: set to true to check that screenshots are not all
