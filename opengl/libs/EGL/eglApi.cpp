@@ -51,7 +51,7 @@ using namespace android;
 
 // This extension has not been ratified yet, so can't be shipped.
 // Implementation is incomplete and untested.
-#define ENABLE_EGL_KHR_GL_COLORSPACE 0
+#define ENABLE_EGL_KHR_GL_COLORSPACE 1
 
 // ----------------------------------------------------------------------------
 
@@ -416,12 +416,6 @@ EGLBoolean eglGetConfigAttrib(EGLDisplay dpy, EGLConfig config,
 // ----------------------------------------------------------------------------
 // surfaces
 // ----------------------------------------------------------------------------
-
-// The EGL_KHR_gl_colorspace spec hasn't been ratified yet, so these haven't
-// been added to the Khronos egl.h.
-#define EGL_GL_COLORSPACE_KHR           EGL_VG_COLORSPACE
-#define EGL_GL_COLORSPACE_SRGB_KHR      EGL_VG_COLORSPACE_sRGB
-#define EGL_GL_COLORSPACE_LINEAR_KHR    EGL_VG_COLORSPACE_LINEAR
 
 // Turn linear formats into corresponding sRGB formats when colorspace is
 // EGL_GL_COLORSPACE_SRGB_KHR, or turn sRGB formats into corresponding linear
