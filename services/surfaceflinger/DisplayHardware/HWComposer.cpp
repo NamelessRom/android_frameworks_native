@@ -750,10 +750,6 @@ status_t HWComposer::prepare() {
 
                     //ALOGD("prepare: %d, type=%d, handle=%p",
                     //        j, l.compositionType, l.handle);
-#ifdef EXYNOS4_HWC_1_1
-                    if(l.compositionType >= HWC_SIDEBAND)
-                        l.compositionType = HWC_FRAMEBUFFER;
-#endif
                     if ((i == DisplayDevice::DISPLAY_PRIMARY) &&
                                 l.flags & HWC_SKIP_LAYER) {
                         l.compositionType = HWC_FRAMEBUFFER;
@@ -1084,6 +1080,14 @@ public:
         }
     }
     virtual void setIsCursorLayerHint(bool isCursor) {
+#ifdef EXYNOS4_HWC_1_1
+        if (isCursor) {
+            getLayer()->flags |= HWC_IS_CURSOR_LAYER;
+        }
+        else {
+            getLayer()->flags &= ~HWC_IS_CURSOR_LAYER;
+        }
+#else
         if (hwcHasApiVersion(mHwc, HWC_DEVICE_API_VERSION_1_4)) {
             if (isCursor) {
                 getLayer()->flags |= HWC_IS_CURSOR_LAYER;
@@ -1092,6 +1096,7 @@ public:
                 getLayer()->flags &= ~HWC_IS_CURSOR_LAYER;
             }
         }
+#endif
     }
     virtual void setAnimating(bool animating) {
         if (animating) {
