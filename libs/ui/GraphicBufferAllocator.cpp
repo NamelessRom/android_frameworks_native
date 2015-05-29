@@ -112,6 +112,10 @@ status_t GraphicBufferAllocator::alloc(uint32_t w, uint32_t h,
 
     // we have a h/w allocator and h/w buffer is requested
     status_t err;
+
+    // Filter out any usage bits that should not be passed to the gralloc module
+    usage &= GRALLOC_USAGE_ALLOC_MASK;
+
 #ifdef QCOM_BSP_LEGACY
     if(bufferSize) {
         err = mAllocDev->allocSize(mAllocDev, w, h,
