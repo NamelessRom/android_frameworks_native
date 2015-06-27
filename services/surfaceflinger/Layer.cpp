@@ -1506,9 +1506,6 @@ uint32_t Layer::getEffectiveUsage(uint32_t usage) const
     }
     if (mPotentialCursor) {
         usage |= GraphicBuffer::USAGE_CURSOR;
-#ifdef EXYNOS4_HWC_1_1
-        usage |= GraphicBuffer::USAGE_EXTERNAL_DISP;
-#endif
     }
     usage |= GraphicBuffer::USAGE_HW_COMPOSER;
     return usage;
