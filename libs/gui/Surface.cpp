@@ -326,10 +326,10 @@ int Surface::lockBuffer_DEPRECATED(android_native_buffer_t* buffer __attribute__
 int Surface::queueBuffer(android_native_buffer_t* buffer, int fenceFd) {
     ATRACE_CALL();
     ALOGV("Surface::queueBuffer");
-    Mutex::Autolock lock(mMutex);
     int64_t timestamp;
     bool isAutoTimestamp = false;
     sp<Fence> fence(fenceFd >= 0 ? new Fence(fenceFd) : Fence::NO_FENCE);
+    mMutex.lock();
     if (mTimestamp == NATIVE_WINDOW_TIMESTAMP_AUTO) {
         timestamp = systemTime(SYSTEM_TIME_MONOTONIC);
         isAutoTimestamp = true;
@@ -343,6 +343,7 @@ int Surface::queueBuffer(android_native_buffer_t* buffer, int fenceFd) {
         if (fenceFd >= 0) {
             close(fenceFd);
         }
+        mMutex.unlock();
         return i;
     }
 
@@ -359,6 +360,7 @@ int Surface::queueBuffer(android_native_buffer_t* buffer, int fenceFd) {
         dirtyRect = Rect(drWidth, drHeight);
     }
 #endif
+    mMutex.unlock();
 
     IGraphicBufferProducer::QueueBufferOutput output;
     IGraphicBufferProducer::QueueBufferInput input(timestamp, isAutoTimestamp, crop,
@@ -371,6 +373,7 @@ int Surface::queueBuffer(android_native_buffer_t* buffer, int fenceFd) {
     if (err != OK)  {
         ALOGE("queueBuffer: error queuing buffer to SurfaceTexture, %d", err);
     }
+    mMutex.lock();
     uint32_t numPendingBuffers = 0;
     uint32_t hint = 0;
     output.deflate(&mDefaultWidth, &mDefaultHeight, &hint,
@@ -385,6 +388,7 @@ int Surface::queueBuffer(android_native_buffer_t* buffer, int fenceFd) {
 #ifdef QCOM_BSP
     mDirtyRect.clear();
 #endif
+    mMutex.unlock();
     return err;
 }
 
