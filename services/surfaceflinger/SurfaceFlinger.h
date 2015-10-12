@@ -143,9 +143,6 @@ public:
         return *mRenderEngine;
     }
 
-#ifdef SWAP_BUFFERS_WORKAROUND
-    int hasVisibleRegions();
-#endif
 #ifdef QCOM_BSP
     // Extended Mode - No video on primary and it will be shown full
     // screen on External
